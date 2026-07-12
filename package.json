@@ -1,0 +1,26 @@
+{
+  "name": "nexguard-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+  "start": "node server.js"
+},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/harshpatle004/NexGuard-Server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/harshpatle004/NexGuard-Server/issues"
+  },
+  "homepage": "https://github.com/harshpatle004/NexGuard-Server#readme",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "socket.io": "^4.8.3"
+  }
+}
