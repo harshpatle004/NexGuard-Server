@@ -1,53 +1,62 @@
+const rooms = new Map();
+
 module.exports = (io) => {
 
     io.on("connection", (socket) => {
 
-        console.log("Connected:", socket.id);
+        console.log("User Connected:", socket.id);
 
-        socket.on("create-room", (roomId) => {
+        socket.on("create-room", () => {
 
-            socket.join(roomId);
+    let roomId;
 
-            socket.emit("room-created", roomId);
+    do {
+        roomId = Math.floor(1000 + Math.random() * 9000).toString();
+    } while ([...rooms.values()].includes(roomId));
 
-            console.log(`Room created: ${roomId}`);
-        });
+    socket.join(roomId);
+    rooms.set(socket.id, roomId);
+
+    console.log(`Room Created: ${roomId} by ${socket.id}`);
+
+    socket.emit("room-created", roomId);
+});
 
         socket.on("join-room", (roomId) => {
 
             socket.join(roomId);
+            rooms.set(socket.id, roomId);
 
             socket.emit("room-joined", roomId);
 
             socket.to(roomId).emit("user-connected");
-
-            console.log(`${socket.id} joined ${roomId}`);
         });
 
-        socket.on("offer", ({ roomId, sdp }) => {
+        socket.on("offer", (data) => {
 
-            socket.to(roomId).emit("offer", sdp);
-
+            socket.to(data.roomId).emit("offer", data);
         });
 
-        socket.on("answer", ({ roomId, sdp }) => {
+        socket.on("answer", (data) => {
 
-            socket.to(roomId).emit("answer", sdp);
-
+            socket.to(data.roomId).emit("answer", data);
         });
 
-        socket.on("ice-candidate", ({ roomId, candidate }) => {
+        socket.on("ice-candidate", (data) => {
 
-            socket.to(roomId).emit("ice-candidate", candidate);
-
+            socket.to(data.roomId).emit("ice-candidate", data);
         });
 
         socket.on("disconnect", () => {
 
-            console.log("Disconnected:", socket.id);
+            const roomId = rooms.get(socket.id);
 
+            if (roomId) {
+                socket.to(roomId).emit("user-disconnected");
+                rooms.delete(socket.id);
+            }
+
+            console.log("User Disconnected:", socket.id);
         });
-
     });
-
 };
